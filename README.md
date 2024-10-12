@@ -25,6 +25,8 @@ Check the "Stage3" folder.
 For stage 4, we implemented pre-processing and post-processing for high entropy by cleaning our QRNG data to extract the highest entropy randomness. We used two extraction methods:
 - Toeplitz matrix hashing randomness extraction
 - Von Neumann randomness extraction
+
+We applied QRNG to a real world benchmark, HPCG (High performance conjugate gradients).
   
 Check the "Stage4" folder.
 
