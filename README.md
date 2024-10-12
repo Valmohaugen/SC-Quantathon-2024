@@ -17,6 +17,7 @@ For stage 3, we characterized noise and fidelity by analyzing our QRNG with the 
 - Looking at the hardware specifications that lead to noise 
 - Seeing how these problems readout assignment error
 - Plotting three simulators: a no noise quantum simulator, a noisy quantum simulator, and a pseudo-random number simulator
+
 From this, we wanted to determine which values of the decoherence times (T1 and T2) and gate error probability would lead to the most noise, thus causing the qubit to fall into one of the states with a greater probability than the other which reduces randomness.
 
 Check the "Stage3" folder.
