@@ -86,7 +86,6 @@ class Toeplitz:
         min_ent = self._min_entropy()
         out_len = 2**self.bits * (min_ent/self.bits)                                    
         out_len = round(out_len)
-        print("outlen", out_len)
         return out_len                                                 
 
     def _toep_mat(self):
