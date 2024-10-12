@@ -86,6 +86,7 @@ class Toeplitz:
         min_ent = self._min_entropy()
         out_len = 2**self.bits * (min_ent/self.bits)                                    
         out_len = round(out_len)
+        print("outlen", out_len)
         return out_len                                                 
 
     def _toep_mat(self):
@@ -103,7 +104,11 @@ class Toeplitz:
         toep_mat = toeplitz(row, col)                                    
         return toep_mat    
 
-    def _dec_num_to_bin(self, data_pt, depth, bin_pts): 
+    def _dec_num_to_bin(self, n, length):
+        n = int(n)
+        return [int(c) for c in f"{n:0{self.bits}b}"]
+
+#    def _dec_num_to_bin(self, data_pt, depth, bin_pts): 
         """ 
         General function converting decimal number to binary number.
 
@@ -121,10 +126,10 @@ class Toeplitz:
         bin_pts : list
             Binary number of size 'bits' converted from decimal.
         """
-        if data_pt >= 1:
-            bin_pts = self._dec_num_to_bin(data_pt // 2, depth - 1, bin_pts)
-            bin_pts[depth] = data_pt % 2
-        return bin_pts                                             
+    #    if data_pt >= 1:
+    #        bin_pts = self._dec_num_to_bin(data_pt // 2, depth - 1, bin_pts)
+    #        bin_pts[depth] = data_pt % 2
+    #    return bin_pts                                             
 
     def _dec_list_to_bin(self):   
         """
@@ -139,9 +144,9 @@ class Toeplitz:
         binned_data, bins = np.histogram(self.data, bins=2**self.bits-1) 
         data_digital = np.digitize(data, bins, right=True)  
         binary_data = []
-        for i in range(2**N):
-            zeros = np.zeros(self.bits)
-            binary_data.append(self._dec_num_to_bin(data_digital[i], self.bits - 1, zeros))      
+        for i in data_digital:#range(2**N):
+            #binary_data.append(self._dec_num_to_bin(data_digital[i], self.bits)) 
+            binary_data.append(self._dec_num_to_bin(i, self.bits))      
         binary_data = np.reshape(binary_data, (2**N, self.bits))
         bin_data_flat = binary_data.flatten()                                
         return bin_data_flat
@@ -161,15 +166,19 @@ class Toeplitz:
         toep_mat = self._toep_mat()                    
         split = np.array_split(data_flat, self.bits * 2**(N-self.bits))  
         data_hashed = np.dot(toep_mat, split[0]) % 2
-        for index, data in enumerate(split[1:-1]):  
+        #for index, data in enumerate(split[1:-1]):  
+        #for index, data in enumerate(split[1:]):  
+        for data in split[1:]:  
             sample_hashed = np.dot(toep_mat, data) % 2 
             data_hashed = np.append(data_hashed, sample_hashed)
-        data_hashed = np.array_split(data_hashed, out_len * 2**(N-self.bits))            
+        data_hashed = np.array_split(data_hashed, out_len * 2**(N-self.bits)) 
         decimal = []                                                       
         for index, sample in enumerate(data_hashed): 
             x = ''.join([str(int(elem)) for elem in sample])
             decimal = np.append(decimal, int(x, 2))
-        hashed_data = decimal[decimal != 254]
+        #hashed_data = decimal[decimal != 2**N-2]
+        hashed_data = decimal
+
         return hashed_data 
    
 
