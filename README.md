@@ -3,6 +3,7 @@ For stage 1, we were tasked with implementing a QRNG on IBM QPUs. To do this, we
 - Concatenation
 - Iteration with chunking
 - Reduce XOR
+
 Check the "Stage1" folder.
 
 For stage 2, we built a classifier to achieve high accuracy with models. We tested:
