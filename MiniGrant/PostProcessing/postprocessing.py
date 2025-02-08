@@ -76,8 +76,8 @@ def apply_fft_toeplitz(qrng_data):
     return np.array(fft_transformed_data.astype(int))
 
 def apply_parity_extractor(qrng_data, block_size=4):
-    truncate_length = (len(array) // block_size) * block_size
-    truncated_array = array[:truncate_length]
+    truncate_length = (len(qrng_data) // block_size) * block_size
+    truncated_array = np.array(qrng_data[:truncate_length], dtype=int)
 
     # Reshape the array into chunks and calculate parity
     chunks = truncated_array.reshape(-1, block_size)
