@@ -22,14 +22,9 @@ def generate_qrng_data(num_bits):
 
     backend_sim = AerSimulator()  # Initialize the AerSimulator
     compiled_sim = transpile(circuit, backend_sim)  # Transpile the circuit
-    result_sim = backend_sim.run(compiled_sim, shots=num_bits).result()  # Run the simulation
-    counts = result_sim.get_counts()
-
-    # Convert measurement results to binary bitstring
-    bits = []
-    for bit, count in counts.items():
-        bits.extend([int(bit)] * count)
-    return np.array(bits[:num_bits])
+    result = backend_sim.run(compiled_sim, shots=num_bits, memory=True).result()      
+    raw_data = result.get_memory()
+    return np.array(raw_data)
 
 # Step 2: Create a Toeplitz matrix
 def create_toeplitz(first_row, first_column):
@@ -44,11 +39,28 @@ def create_toeplitz(first_row, first_column):
                 toeplitz_matrix[i, j] = first_column[i - j]
     return toeplitz_matrix
 
+
+
 # Step 3: Calculate Shannon entropy
 def shannon_entropy(data):
     _, counts = np.unique(data, return_counts=True)
     probabilities = counts / len(data)
     return entropy(probabilities, base=2)
+
+def apply_von_neumann_extractor(qrng_data):
+    extracted_bits = []
+    
+    # Iterate over the bitstring in pairs
+    for i in range(0, len(qrng_data) - 1, 2):
+        a = qrng_data[i]
+        b = qrng_data[i+1]
+        
+        # Only keep the result when the pair has different bits
+        if a != b:
+            extracted_bits.append(a)
+    
+    # Return the extracted bitstring
+    return np.array(extracted_bits)
 
 # Step 4: Apply Toeplitz transformation dynamically
 def apply_toeplitz_dynamically(qrng_data, toeplitz_matrix, block_size):
