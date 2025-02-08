@@ -70,7 +70,7 @@ def apply_fft_toeplitz(qrng_data, toeplitz_matrix, block_size):
         transformed_data.extend(transformed_block)
     return np.array(transformed_data)
 
-def apply_parity_extractor(qrng_data, block_size)
+def apply_parity_extractor(qrng_data, block_size):
     truncate_length = (len(array) // block_size) * block_size
     truncated_array = array[:truncate_length]
 
