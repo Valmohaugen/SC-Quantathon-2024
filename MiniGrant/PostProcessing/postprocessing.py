@@ -75,7 +75,7 @@ def apply_fft_toeplitz(qrng_data):
     fft_transformed_data = np.real(fft(apply_toeplitz_transformation(qrng_data)) > 0.5)
     return np.array(fft_transformed_data.astype(int))
 
-def apply_parity_extractor(qrng_data, block_size):
+def apply_parity_extractor(qrng_data, block_size=4):
     truncate_length = (len(array) // block_size) * block_size
     truncated_array = array[:truncate_length]
 
