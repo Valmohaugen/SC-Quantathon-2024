@@ -14,7 +14,6 @@ def generate_high_entropy_array(size: int) -> np.ndarray:
     prob_zero = 0.5
     return np.random.choice([0, 1], size=size, p=[prob_zero, 1 - prob_zero])
 
-# Step 1: Generate QRNG data using Qiskit
 def generate_qrng_data(num_bits):
     circuit = QuantumCircuit(1, 1)
     circuit.h(0)  # Apply Hadamard gate to create superposition
@@ -26,7 +25,6 @@ def generate_qrng_data(num_bits):
     raw_data = result.get_memory()
     return np.array(raw_data)
 
-# Step 2: Create a Toeplitz matrix
 def create_toeplitz(first_row, first_column):
     n = len(first_row)
     m = len(first_column)
@@ -40,8 +38,6 @@ def create_toeplitz(first_row, first_column):
     return toeplitz_matrix
 
 
-
-# Step 3: Calculate Shannon entropy
 def shannon_entropy(data):
     _, counts = np.unique(data, return_counts=True)
     probabilities = counts / len(data)
@@ -62,25 +58,22 @@ def apply_von_neumann_extractor(qrng_data):
     # Return the extracted bitstring
     return np.array(extracted_bits)
 
-# Step 4: Apply Toeplitz transformation dynamically
-def apply_toeplitz_dynamically(qrng_data, toeplitz_matrix, block_size):
+def apply_toeplitz_transformation(qrng_data, blocksize=128):
     transformed_data = []
-    for i in range(0, len(qrng_data) - block_size + 1, block_size):
-        block = qrng_data[i:i + block_size]
-        transformed_block = np.dot(toeplitz_matrix, block) % 2
-        transformed_data.extend(transformed_block)
+    first_row = np.random.randint(0, 2, blocksize)
+    first_column = np.random.randint(0, 2, blocksize)
+    toeplitz_matrix = create_toeplitz(first_row, first_column)
+
+    # Step 3: Apply Toeplitz transformation
+    for i in range(0, len(qrng_data), blocksize):
+        data = qrng_data[i:i+blocksize].astype(int)
+        if len(data) == blocksize: 
+            transformed_data += list((toeplitz_matrix @ data) % 2)
     return np.array(transformed_data)
 
-# Step 5: Apply FFT-based Toeplitz transformation
-def apply_fft_toeplitz(qrng_data, toeplitz_matrix, block_size):
-    transformed_data = []
-    for i in range(0, len(qrng_data) - block_size + 1, block_size):
-        block = qrng_data[i:i + block_size]
-        fft_block = fft(block)
-        fft_toeplitz = fft(toeplitz_matrix, axis=1)
-        transformed_block = np.real(np.fft.ifft(fft_block * fft_toeplitz)).astype(int) % 2
-        transformed_data.extend(transformed_block)
-    return np.array(transformed_data)
+def apply_fft_toeplitz(qrng_data):
+    fft_transformed_data = np.real(fft(apply_toeplitz_transformation(qrng_data)) > 0.5)
+    return np.array(fft_transformed_data.astype(int))
 
 def apply_parity_extractor(qrng_data, block_size):
     truncate_length = (len(array) // block_size) * block_size
