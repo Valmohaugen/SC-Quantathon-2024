@@ -352,12 +352,12 @@ if machine == 'simulator':
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
 elif machine == 'ibm_brisbane':
-    with open(f'../Data/{date}_{machine}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
+    with open(f'../Data/{date}_{machine.split('_')[-1]}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
 elif machine == 'ibm_sherbrooke':
-    with open(f'../Data/{date}_{machine}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
+    with open(f'../Data/{date}_{machine.split('_')[-1]}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
