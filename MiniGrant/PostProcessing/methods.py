@@ -349,17 +349,18 @@ date = f"{datetime.now().strftime('%b')}{datetime.now().day}"
 
 # Writes data to a file
 if machine == 'simulator':
-    with open(f'{date}_{machine}_{num_qubits}_{num_shots}_{chunk_size}_{mod2_mods}.txt', 'w') as f:
+    with open(f'{date}_{machine}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
 elif machine == 'ibm_brisbane':
-    with open(f'{date}_{machine}_{num_qubits}_{num_shots}_{chunk_size}_{mod2_mods}.txt', 'w') as f:
+    with open(f'{date}_{machine}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
 elif machine == 'ibm_sherbrooke':
-    with open(f'{date}_{machine}_{num_qubits}_{num_shots}_{chunk_size}_{mod2_mods}.txt', 'w') as f:
+    with open(f'{date}_{machine}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
+        for shot in data:
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
