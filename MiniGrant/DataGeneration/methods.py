@@ -15,9 +15,9 @@ from qiskit_ibm_runtime import *
 from qiskit.visualization import *
 
 # Variables
-method = 1                       # Chosen method to run
+method = 3                       # Chosen method to run
 machine = 'simulator'            # Chosen machine to submit jobs to
-num_qubits = 100                 # Number of qubits to run on
+num_qubits = 1000                 # Number of qubits to run on
 num_shots = 1024                 # Number of shots to take
 chunk_size = 30                  # Size of the chunking for the mod2 and iteration methods
 mod2_mods = 3                    # Number of times to apply mod2. The value inputted results in 2 runs per 1 value. mod2_mods=3 --> 6 jobs QPU submitted
