@@ -393,13 +393,22 @@ if machine == 'simulator':
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
+        f.write(f'\nNumber of bits: {len(data)}')
+        f.write(f'\nTime taken: {t1 - t0} s')
+        # f.write(f'\nJob IDs: {job_ids}')
 elif machine == 'ibm_brisbane':
     with open(f'../Data/{date}_{machine.split('_')[-1]}_method{method}_{num_qubits}qubits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
+        f.write(f'\nNumber of bits: {len(data)}')
+        f.write(f'\nTime taken: {t1 - t0} s')
+        # f.write(f'\nJob IDs: {job_ids}')
 elif machine == 'ibm_sherbrooke':
     with open(f'../Data/{date}_{machine.split('_')[-1]}_method{method}_{num_qubits}qubits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
+        f.write(f'\nNumber of bits: {len(data)}')
+        f.write(f'\nTime taken: {t1 - t0} s')
+        # f.write(f'\nJob IDs: {job_ids}')
