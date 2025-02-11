@@ -7,6 +7,7 @@ Method 4: All previous methods combined
 
 # Imports
 import time
+from datetime import datetime
 import numpy as np
 from qiskit import *
 from qiskit_aer import *
@@ -327,7 +328,7 @@ def method4(machine, chunk_size, mod2_mods):
 
 
 
-# File writing with data
+# Obtains throughput and date
 t0 = time.time()
 
 match method:
@@ -341,17 +342,24 @@ match method:
         data = method4(machine, chunk_size, mod2_mods)
 
 t1 = time.time()
-throughput = num_qubits / (t1 - t0)
+throughput = (num_qubits * num_shots) / (t1 - t0)
+date = f"{datetime.now().strftime('%b')}{datetime.now().day}"
 
+
+
+# Writes data to a file
 if machine == 'simulator':
-    with open(f'{machine}_{num_qubits}_{num_shots}_{chunk_size}_{mod2_mods}.txt', 'w') as f:
+    with open(f'{date}_{machine}_{num_qubits}_{num_shots}_{chunk_size}_{mod2_mods}}.txt', 'w') as f:
         for shot in data:
             f.write(shot)
+        f.write(f'\nThroughput: {throughput/1e6} Mb/s')
 elif machine == 'ibm_brisbane':
-    with open(f'{machine}_{num_qubits}_{num_shots}_{chunk_size}_{mod2_mods}.txt', 'w') as f:
+    with open(f'{date}_{machine}_{num_qubits}_{num_shots}_{chunk_size}_{mod2_mods}.txt', 'w') as f:
         for shot in data:
             f.write(shot)
+        f.write(f'\nThroughput: {throughput/1e6} Mb/s')
 elif machine == 'ibm_sherbrooke':
-    with open(f'{machine}_{num_qubits}_{num_shots}_{chunk_size}_{mod2_mods}.txt', 'w') as f:
+    with open(f'{date}_{machine}_{num_qubits}_{num_shots}_{chunk_size}_{mod2_mods}.txt', 'w') as f:
         for shot in data:
             f.write(shot)
+        f.write(f'\nThroughput: {throughput/1e6} Mb/s')
