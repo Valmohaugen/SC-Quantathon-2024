@@ -23,10 +23,59 @@ num_shots = 1024                 # Number of shots to take
 chunk_size = 30                  # Size of the chunking for the mod2 and iteration methods
 mod2_mods = 3                    # Number of times to apply mod2. The value inputted results in 2 runs per 1 value. mod2_mods=3 --> 6 jobs QPU submitted
 
+# QRNG for method1, method2, and method3
+def number_generator_simulator_123(num_qubits):
+    circ = QuantumCircuit(num_qubits, num_qubits)                 # Creates circuit with number of qubits obtained
+    circ.h(range(num_qubits))                                     # Applies a hadamard gate to all qubits
+    circ.measure(range(num_qubits), range(num_qubits))            # Measures all qubits and assigns them to classical bits
 
+    simulator = AerSimulator()                                         # Lets us use the Aer Simulator 
+    compiled_circuit = transpile(circ, simulator)                      # Compiled circuit using Aer 
+    result = simulator.run(compiled_circuit, shots = 1024).result()      # Result with the 10000 shots as to not run forever on IBM machines
+    counts = result.get_counts()                                       # Assigns counts with the result
+    
+    return counts
 
-# QRNG machines
-def number_generator_simulator(num_qubits):
+def number_generator_brisbane_123(num_qubits):
+    circ = QuantumCircuit(num_qubits, num_qubits)                 # Creates circuit with number of qubits obtained
+    circ.h(range(num_qubits))                                     # Applies a hadamard gate to all qubits
+    circ.measure(range(num_qubits), range(num_qubits))            # Measures all qubits and assigns them to classical bits
+
+    brisbane_backend = service.backend('ibm_brisbane')            # Creates a backend with ibm_brisbane
+
+    # Runs the QRNG on ibm_brisbane with 1024 shots
+    pm = generate_preset_pass_manager(backend = brisbane_backend, optimization_level = 3)
+    isa_circuit = pm.run(circ)
+    with Session(backend = brisbane_backend) as session:
+        sampler = Sampler()
+        job = sampler.run([isa_circuit], shots = 1024)
+        print(job.status())
+        print(job.result())
+        counts = job.result()[0].data.c.get_counts()
+    
+    return counts
+
+def number_generator_sherbrooke_123(num_qubits):
+    circ = QuantumCircuit(num_qubits, num_qubits)                 # Creates circuit with number of qubits obtained
+    circ.h(range(num_qubits))                                     # Applies a hadamard gate to all qubits
+    circ.measure(range(num_qubits), range(num_qubits))            # Measures all qubits and assigns them to classical bits
+
+    sherbrooke_backend = service.backend('ibm_sherbrooke')        # Creates a backend with ibm_sherbrooke
+
+    # Runs the QRNG on ibm_sherbrooke with 1024 shots
+    pm = generate_preset_pass_manager(backend = sherbrooke_backend, optimization_level = 3)
+    isa_circuit = pm.run(circ)
+    with Session(backend = sherbrooke_backend) as session:
+        sampler = Sampler()
+        job = sampler.run([isa_circuit], shots = 1024)
+        print(job.status())
+        print(job.result())
+        counts = job.result()[0].data.c.get_counts()
+    
+    return counts
+
+# QRNG for method4
+def number_generator_simulator_4(num_qubits, num_shots):
     circ = QuantumCircuit(num_qubits, num_qubits)                 # Creates circuit with number of qubits obtained
     circ.h(range(num_qubits))                                     # Applies a hadamard gate to all qubits
     circ.measure(range(num_qubits), range(num_qubits))            # Measures all qubits and assigns them to classical bits
@@ -39,7 +88,7 @@ def number_generator_simulator(num_qubits):
 
     return data     # Returns a concatenated string of all binary digits in the order that they were measured
 
-def number_generator_brisbane(num_qubits):
+def number_generator_brisbane_4(num_qubits, num_shots):
     circ = QuantumCircuit(num_qubits, num_qubits)                 # Creates circuit with number of qubits obtained
     circ.h(range(num_qubits))                                     # Applies a hadamard gate to all qubits
     circ.measure(range(num_qubits), range(num_qubits))            # Measures all qubits and assigns them to classical bits
@@ -59,7 +108,7 @@ def number_generator_brisbane(num_qubits):
         
     return data     # Returns a concatenated string of all binary digits in the order that they were measured
 
-def number_generator_sherbrooke(num_qubits):
+def number_generator_sherbrooke_4(num_qubits, num_shots):
     circ = QuantumCircuit(num_qubits, num_qubits)                 # Creates circuit with number of qubits obtained
     circ.h(range(num_qubits))                                     # Applies a hadamard gate to all qubits
     circ.measure(range(num_qubits), range(num_qubits))            # Measures all qubits and assigns them to classical bits
@@ -78,8 +127,6 @@ def number_generator_sherbrooke(num_qubits):
         data = ''.join(raw_data)
 
     return data     # Returns a concatenated string of all binary digits in the order that they were measured
-
-
 
 # Necessary functions for the following methods
 def obtain_ties(counts, machine):          # Method 1 - Obtains value of max qubit states
@@ -170,7 +217,7 @@ def iterationChunker(machine, chunk_size):          # Method 4 - Iterates simlia
 
     return rand_num
 
-# Actual methods
+# Actual methods for QRNG
 def method1(num_qubits, chunk_size, machine):
     chunks = int(np.floor(num_qubits / chunk_size))
     remainder = int(num_qubits - chunks * chunk_size)
@@ -326,11 +373,8 @@ def method4(machine, chunk_size, mod2_mods):
     
     return final_rand_num
 
-
-
 # Obtains throughput and date
 t0 = time.time()
-
 match method:
     case 1:
         data = method1(num_qubits, chunk_size, machine)
@@ -340,7 +384,6 @@ match method:
         data = method3(num_qubits, chunk_size, machine)
     case 4:
         data = method4(machine, chunk_size, mod2_mods)
-
 t1 = time.time()
 throughput = (num_qubits * num_shots) / (t1 - t0)
 date = f"{datetime.now().strftime('%b')}{datetime.now().day}"
