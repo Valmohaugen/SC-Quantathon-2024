@@ -1,10 +1,10 @@
-from qiskit.visualization import *
-from qiskit_ibm_runtime import *
 import numpy as np
-from qiskit import *
-from qiskit_aer import *
 from scipy.fft import fft
 from scipy.stats import entropy
+from qiskit import *
+from qiskit_aer import *
+from qiskit_ibm_runtime import *
+from qiskit.visualization import *
 
 def generate_low_entropy_array(size: int) -> np.ndarray:
     prob_zero = 0.9
