@@ -1,18 +1,23 @@
-''''''''''
+'''
 Method 1: Mod2
 Method 2: Iteration chunker
 Method 3: Concatenation
 Method 4: All previous methods combined
-''''''''''
+'''
 
 # Imports
 import time
+import numpy as np
+from qiskit import *
+from qiskit_aer import *
+from qiskit_ibm_runtime import *
+from qiskit.visualization import *
 
 
 # Variables
-method = 1                       # Chosen method to run
-machine = 'ibm_brisbane'            # Chosen machine to submit jobs to
-num_qubits = 30                  # Number of qubits to run on
+method = 4                       # Chosen method to run
+machine = 'simulator'            # Chosen machine to submit jobs to
+num_qubits = 100                  # Number of qubits to run on
 num_shots = 1024                 # Number of shots to take
 chunk_size = 30                  # Size of the chunking for the mod2 and iteration methods
 mod2_mods = 3                    # Number of times to apply mod2. The value inputted results in 2 runs per 1 value. mod2_mods=3 --> 6 jobs QPU submitted
@@ -323,8 +328,21 @@ def method4(machine, chunk_size, mod2_mods):
 
 
 # File writing with data
-data = method1(num_qubits, chunk_size, machine)
-# data = method4(machine, chunk_size, mod2_mods)
+t0 = time.time()
+
+match method:
+    case 1:
+        data = method1(num_qubits, chunk_size, machine)
+    case 2:
+        data = method2(num_qubits, chunk_size, machine)
+    case 3:
+        data = method3(num_qubits, chunk_size, machine)
+    case 4:
+        data = method4(machine, chunk_size, mod2_mods)
+
+t1 = time.time()
+throughput = num_qubits / (t1 - t0)
+
 if machine == 'simulator':
     with open(f'{machine}_{num_qubits}_{num_shots}_{chunk_size}_{mod2_mods}.txt', 'w') as f:
         for shot in data:
