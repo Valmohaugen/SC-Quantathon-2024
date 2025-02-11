@@ -14,11 +14,10 @@ from qiskit_aer import *
 from qiskit_ibm_runtime import *
 from qiskit.visualization import *
 
-
 # Variables
 method = 1                       # Chosen method to run
 machine = 'simulator'            # Chosen machine to submit jobs to
-num_qubits = 100                  # Number of qubits to run on
+num_qubits = 100                 # Number of qubits to run on
 num_shots = 1024                 # Number of shots to take
 chunk_size = 30                  # Size of the chunking for the mod2 and iteration methods
 mod2_mods = 3                    # Number of times to apply mod2. The value inputted results in 2 runs per 1 value. mod2_mods=3 --> 6 jobs QPU submitted
@@ -143,11 +142,11 @@ def tie_breaker(ties, machine):          # Method 1 - Breaks a tie if there is o
     new_num_qubits = int(np.ceil(np.log2(len(ties))))
 
     if machine == 'ibm_brisbane':
-        counts = number_generator_brisbane(new_num_qubits)
+        counts = number_generator_brisbane_123(new_num_qubits)
     elif machine == 'ibm_sherbrooke':
-        counts = number_generator_sherbrooke(new_num_qubits)
+        counts = number_generator_sherbrooke_123(new_num_qubits)
     elif machine == 'simulator':
-        counts = number_generator_simulator(new_num_qubits)
+        counts = number_generator_simulator_123(new_num_qubits)
 
     # Discard out of range
     counts = {key: value for key, value in counts.items() if int(key,2) < len(ties)}
@@ -200,20 +199,20 @@ def iterationChunker(machine, chunk_size):          # Method 4 - Iterates simlia
 
     for i in range(0, chunks):
         if machine == 'simulator':
-            rand_num += number_generator_simulator(chunk_size, num_shots)
+            rand_num += number_generator_simulator_4(chunk_size, num_shots)
         elif machine == 'ibm_brisbane':
-            rand_num += number_generator_brisbane(chunk_size, num_shots)
+            rand_num += number_generator_brisbane_4(chunk_size, num_shots)
         elif machine == 'ibm_sherbrooke':
-            rand_num += number_generator_sherbrooke(chunk_size, num_shots)
+            rand_num += number_generator_sherbrooke_4(chunk_size, num_shots)
 
     if remainder != 0:
         for i in range(0, chunks):
             if machine == 'simulator':
-                rand_num += number_generator_simulator(chunk_size, num_shots)
+                rand_num += number_generator_simulator_4(chunk_size, num_shots)
             elif machine == 'ibm_brisbane':
-                rand_num += number_generator_brisbane(chunk_size, num_shots)
+                rand_num += number_generator_brisbane_4(chunk_size, num_shots)
             elif machine == 'ibm_sherbrooke':
-                rand_num += number_generator_sherbrooke(chunk_size, num_shots)
+                rand_num += number_generator_sherbrooke_4(chunk_size, num_shots)
 
     return rand_num
 
@@ -225,31 +224,31 @@ def method1(num_qubits, chunk_size, machine):
 
     if machine == 'ibm_brisbane':
         for i in range(0, chunks):
-            counts = number_generator_brisbane(chunk_size)
+            counts = number_generator_brisbane_123(chunk_size)
             rand_value = obtain_rand(counts)
             rand_num += rand_value
     elif machine == 'ibm_sherbrooke':
         for i in range(0, chunks):
-            counts = number_generator_sherbrooke(chunk_size)
+            counts = number_generator_sherbrooke_123(chunk_size)
             rand_value = obtain_rand(counts)
             rand_num += rand_value
     elif machine == 'simulator': 
         for i in range(0, chunks):
-            counts = number_generator_simulator(chunk_size)
+            counts = number_generator_simulator_123(chunk_size)
             rand_value = obtain_rand(counts)
             rand_num += rand_value
 
     if remainder != 0:
         if machine == 'ibm_brisbane':
-            counts = number_generator_brisbane(remainder)
+            counts = number_generator_brisbane_123(remainder)
             rand_value = obtain_ties(counts, machine)
             rand_num += rand_value
         elif machine == 'ibm_sherbrooke':
-            counts = number_generator_sherbrooke(remainder)
+            counts = number_generator_sherbrooke_123(remainder)
             rand_value = obtain_ties(counts, machine)
             rand_num += rand_value
         elif machine == 'simulator':
-            counts = number_generator_simulator(remainder)
+            counts = number_generator_simulator_123(remainder)
             rand_value = obtain_ties(counts, machine)
             rand_num += rand_value
 
@@ -262,31 +261,31 @@ def method2(num_qubits, chunk_size, machine):
 
     if machine == 'ibm_brisbane':
         for i in range(0, chunks):
-            counts = number_generator_brisbane(chunk_size)
+            counts = number_generator_brisbane_123(chunk_size)
             rand_value = obtain_ties(counts, machine)
             rand_num += rand_value
     elif machine == 'ibm_sherbrooke':
         for i in range(0, chunks):
-            counts = number_generator_sherbrooke(chunk_size)
+            counts = number_generator_sherbrooke_123(chunk_size)
             rand_value = obtain_ties(counts, machine)
             rand_num += rand_value
     elif machine == 'simulator':
         for i in range(0, chunks):
-            counts = number_generator_simulator(chunk_size)
+            counts = number_generator_simulator_123(chunk_size)
             rand_value = obtain_ties(counts, machine)
             rand_num += rand_value
 
     if remainder != 0:
         if machine == 'ibm_brisbane':
-            counts = number_generator_brisbane(remainder)
+            counts = number_generator_brisbane_123(remainder)
             rand_value = obtain_ties(counts, machine)
             rand_num += rand_value
         elif machine == 'ibm_sherbrooke':
-            counts = number_generator_sherbrooke(remainder)
+            counts = number_generator_sherbrooke_123(remainder)
             rand_value = obtain_ties(counts, machine)
             rand_num += rand_value
         elif machine == 'simulator':
-            counts = number_generator_simulator(remainder)
+            counts = number_generator_simulator_123(remainder)
             rand_value = obtain_ties(counts, machine)
             rand_num += rand_value
 
@@ -302,7 +301,7 @@ def method3(num_qubits, division_size, machine):
             division_chunk = None
 
             while division_chunk is None:
-                counts = number_generator_brisbane(division_size)
+                counts = number_generator_brisbane_123(division_size)
                 division_chunk = check_tie(counts)
             final_output.append(division_chunk)
 
@@ -310,7 +309,7 @@ def method3(num_qubits, division_size, machine):
             division_chunk = None
 
             while division_chunk is None:
-                counts = number_generator_brisbane(extra)
+                counts = number_generator_brisbane_123(extra)
                 division_chunk = check_tie(counts)
             final_output.append(division_chunk)
 
@@ -320,7 +319,7 @@ def method3(num_qubits, division_size, machine):
             division_chunk = None
 
             while division_chunk is None:
-                counts = number_generator_sherbrooke(division_size)
+                counts = number_generator_sherbrooke_123(division_size)
                 division_chunk = check_tie(counts)
             final_output.append(division_chunk)
 
@@ -328,7 +327,7 @@ def method3(num_qubits, division_size, machine):
             division_chunk = None
 
             while division_chunk is None:
-                counts = number_generator_sherbrooke(extra)
+                counts = number_generator_sherbrooke_123(extra)
                 division_chunk = check_tie(counts)
             final_output.append(division_chunk)
 
@@ -338,7 +337,7 @@ def method3(num_qubits, division_size, machine):
             division_chunk = None
 
             while division_chunk is None:
-                counts = number_generator_simulator(division_size)
+                counts = number_generator_simulator_123(division_size)
                 division_chunk = check_tie(counts)
             final_output.append(division_chunk)
 
@@ -346,7 +345,7 @@ def method3(num_qubits, division_size, machine):
             division_chunk = None
 
             while division_chunk is None:
-                counts = number_generator_simulator(extra)
+                counts = number_generator_simulator_123(extra)
                 division_chunk = check_tie(counts)
             final_output.append(division_chunk)
 
@@ -390,17 +389,17 @@ date = f"{datetime.now().strftime('%b')}{datetime.now().day}"
 
 # Writes data to a file
 if machine == 'simulator':
-    with open(f'../Data/{date}_{machine}_method{method}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
+    with open(f'../Data/{date}_{machine}_method{method}_{num_qubits}qubits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
 elif machine == 'ibm_brisbane':
-    with open(f'../Data/{date}_{machine.split('_')[-1]}_method{method}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
+    with open(f'../Data/{date}_{machine.split('_')[-1]}_method{method}_{num_qubits}qubits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
 elif machine == 'ibm_sherbrooke':
-    with open(f'../Data/{date}_{machine.split('_')[-1]}_method{method}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
+    with open(f'../Data/{date}_{machine.split('_')[-1]}_method{method}_{num_qubits}qubits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
