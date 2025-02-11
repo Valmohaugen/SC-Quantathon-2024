@@ -16,7 +16,7 @@ from qiskit.visualization import *
 
 
 # Variables
-method = 4                       # Chosen method to run
+method = 1                       # Chosen method to run
 machine = 'simulator'            # Chosen machine to submit jobs to
 num_qubits = 100                  # Number of qubits to run on
 num_shots = 1024                 # Number of shots to take
@@ -26,7 +26,7 @@ mod2_mods = 3                    # Number of times to apply mod2. The value inpu
 
 
 # QRNG machines
-def number_generator_simulator(num_qubits, num_shots):
+def number_generator_simulator(num_qubits):
     circ = QuantumCircuit(num_qubits, num_qubits)                 # Creates circuit with number of qubits obtained
     circ.h(range(num_qubits))                                     # Applies a hadamard gate to all qubits
     circ.measure(range(num_qubits), range(num_qubits))            # Measures all qubits and assigns them to classical bits
@@ -39,7 +39,7 @@ def number_generator_simulator(num_qubits, num_shots):
 
     return data     # Returns a concatenated string of all binary digits in the order that they were measured
 
-def number_generator_brisbane(num_qubits, num_shots):
+def number_generator_brisbane(num_qubits):
     circ = QuantumCircuit(num_qubits, num_qubits)                 # Creates circuit with number of qubits obtained
     circ.h(range(num_qubits))                                     # Applies a hadamard gate to all qubits
     circ.measure(range(num_qubits), range(num_qubits))            # Measures all qubits and assigns them to classical bits
@@ -59,7 +59,7 @@ def number_generator_brisbane(num_qubits, num_shots):
         
     return data     # Returns a concatenated string of all binary digits in the order that they were measured
 
-def number_generator_sherbrooke(num_qubits, num_shots):
+def number_generator_sherbrooke(num_qubits):
     circ = QuantumCircuit(num_qubits, num_qubits)                 # Creates circuit with number of qubits obtained
     circ.h(range(num_qubits))                                     # Applies a hadamard gate to all qubits
     circ.measure(range(num_qubits), range(num_qubits))            # Measures all qubits and assigns them to classical bits
@@ -347,17 +347,17 @@ date = f"{datetime.now().strftime('%b')}{datetime.now().day}"
 
 # Writes data to a file
 if machine == 'simulator':
-    with open(f'../Data/{date}_{machine}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
+    with open(f'../Data/{date}_{machine}_method{method}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
 elif machine == 'ibm_brisbane':
-    with open(f'../Data/{date}_{machine.split('_')[-1]}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
+    with open(f'../Data/{date}_{machine.split('_')[-1]}_method{method}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
 elif machine == 'ibm_sherbrooke':
-    with open(f'../Data/{date}_{machine.split('_')[-1]}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
+    with open(f'../Data/{date}_{machine.split('_')[-1]}_method{method}_{num_qubits}bits_{num_shots}shots_{chunk_size}chunkSize_{mod2_mods}mods.txt', 'w') as f:
         for shot in data:
             f.write(shot)
         f.write(f'\nThroughput: {throughput/1e6} Mb/s')
