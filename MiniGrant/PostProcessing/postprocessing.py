@@ -6,13 +6,13 @@ from qiskit_aer import *
 from scipy.fft import fft
 from scipy.stats import entropy
 
-def generate_low_entropy_array(size: int) -> np.ndarray:
+def generate_low_entropy_array(size: int) -> np.array:
     prob_zero = 0.9
-    return np.random.choice([0, 1], size=size, p=[prob_zero, 1 - prob_zero])
+    return np.array(np.random.choice([0, 1], size=size, p=[prob_zero, 1 - prob_zero]), dtype=np.uint8)
 
-def generate_high_entropy_array(size: int) -> np.ndarray:
+def generate_high_entropy_array(size: int) -> np.array:
     prob_zero = 0.5
-    return np.random.choice([0, 1], size=size, p=[prob_zero, 1 - prob_zero])
+    return np.array(np.random.choice([0, 1], size=size, p=[prob_zero, 1 - prob_zero]), dtype=np.uint8)
 
 def generate_qrng_data(num_bits):
     circuit = QuantumCircuit(1, 1)
@@ -23,7 +23,7 @@ def generate_qrng_data(num_bits):
     compiled_sim = transpile(circuit, backend_sim)  # Transpile the circuit
     result = backend_sim.run(compiled_sim, shots=num_bits, memory=True).result()      
     raw_data = result.get_memory()
-    return np.array(raw_data)
+    return np.array(raw_data, dtype=np.uint8)
 
 def create_toeplitz(first_row, first_column):
     n = len(first_row)
@@ -60,8 +60,8 @@ def apply_von_neumann_extractor(qrng_data):
 
 def apply_toeplitz_transformation(qrng_data, blocksize=128):
     transformed_data = []
-    first_row = np.random.randint(0, 2, blocksize)
-    first_column = np.random.randint(0, 2, blocksize)
+    first_row = np.random.randint(0, 2, blocksize) ^ np.array(qrng_data[:blocksize])
+    first_column = np.random.randint(0, 2, blocksize) ^ np.array(qrng_data[:blocksize])
     toeplitz_matrix = create_toeplitz(first_row, first_column)
 
     # Step 3: Apply Toeplitz transformation
@@ -75,11 +75,11 @@ def apply_fft_toeplitz(qrng_data):
     fft_transformed_data = np.real(fft(apply_toeplitz_transformation(qrng_data)) > 0.5)
     return np.array(fft_transformed_data.astype(int))
 
-def apply_parity_extractor(qrng_data, block_size=4):
-    truncate_length = (len(qrng_data) // block_size) * block_size
+def apply_parity_extractor(qrng_data, blocksize=4):
+    truncate_length = (len(qrng_data) // blocksize) * blocksize
     truncated_array = np.array(qrng_data[:truncate_length], dtype=int)
 
     # Reshape the array into chunks and calculate parity
-    chunks = truncated_array.reshape(-1, block_size)
+    chunks = truncated_array.reshape(-1, blocksize)
     parity_array = np.sum(chunks, axis=1) % 2  # 0 for even parity, 1 for odd parity
     return np.array(parity_array)
