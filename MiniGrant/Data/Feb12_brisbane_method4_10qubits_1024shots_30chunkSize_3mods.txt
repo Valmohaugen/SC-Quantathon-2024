@@ -1,0 +1,3 @@
+Throughput: 104.50042082725061 Mb/s
+Number of bits: 0
+Time taken: 9.799003601074219e-05 s
