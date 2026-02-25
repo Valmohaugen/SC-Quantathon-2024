@@ -6,6 +6,7 @@ Method 4: All previous methods combined
 '''
 
 # Imports
+import os
 import time
 from datetime import datetime, timezone
 import numpy as np
@@ -23,9 +24,17 @@ chunk_size = 30                  # Size of the chunking for the mod2 and iterati
 mod2_mods = 3                    # Number of times to apply mod2. The value inputted results in 2 runs per 1 value. mod2_mods=3 --> 6 jobs QPU submitted
 
 # Lets us use IBM machines
-QiskitRuntimeService.save_account(channel = 'ibm_quantum', token = '4b3a2ecb92b9446de636396b89dd76f0d61c2715122c6a353720e5b58c124a7d3d20528012332d57add9a37a61aaf508b54c97698ddc770f922d68fd213b1b25',
-                                  overwrite = True, set_as_default = True)
-service = QiskitRuntimeService(instance = "ibm-q/open/main")
+# Set the IBM_QUANTUM_TOKEN environment variable before running:
+#   export IBM_QUANTUM_TOKEN="your-token-here"
+token = os.environ.get("IBM_QUANTUM_TOKEN")
+if token is None:
+    raise EnvironmentError(
+        "Set the IBM_QUANTUM_TOKEN environment variable. "
+        "See https://quantum.ibm.com/ to generate a token."
+    )
+QiskitRuntimeService.save_account(channel='ibm_quantum', token=token,
+                                  overwrite=True, set_as_default=True)
+service = QiskitRuntimeService(instance="ibm-q/open/main")
 
 # QRNG for method1, method2, and method3
 def number_generator_simulator_123(num_qubits, num_shots):

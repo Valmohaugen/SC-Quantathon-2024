@@ -1,0 +1,8 @@
+qiskit>=1.0
+qiskit-aer>=0.13
+qiskit-ibm-runtime>=0.20
+numpy
+scipy
+matplotlib
+scikit-learn
+pandas

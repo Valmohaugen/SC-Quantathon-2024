@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.mypy_cache/
+
+# Environment
+.env
+*.log
+
+# Data (large QRNG output files)
+MiniGrant/Data/
+
+# Binary artifacts
+*.h5
+*.hdf5
+*.npy
+*.pth
+*.pkl
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Compiled binaries
+*.so
+*.o
+xhpcg

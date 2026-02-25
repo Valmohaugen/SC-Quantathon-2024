@@ -1,43 +1,118 @@
-# SC Quantathon v1 2024: DoraHacks Challenge
- 
-This repository is the home for the SC Quantathon v1 2024 DoraHacks challenge, a quantum random number generator and simulation benchmarking workflow for producing large-scale qubit datasets across multiple simulation methods, with post-processing, analysis, and a structured, extensible pipeline.
- 
- ## Features
- 
- - **Quantum Data Generation:** Flexible scripts for generating binary string datasets, simulating quantum circuits, and producing large-scale qubit data. Easily adjust parameters like qubit count, shot number, chunk size, and simulation method.
- - **Multi-Method Simulation:** Explore and compare different simulation approaches (e.g., method1, method2, method3, method4) across a range of qubit sizes, using both classical and quantum-inspired techniques.
- - **Post-Processing & Analysis:** Tools for parsing, transforming, and analyzing raw simulation outputs. Includes utilities for renaming datasets, organizing results, and extracting meaningful statistics.
- - **Organized Data Structure:** Datasets are grouped by simulation method, date, and parameters, making it easy to locate and benchmark results. Modular folders for each stage of the workflow (generation, processing, analysis).
- - **Extensible Workflow:** Add new simulation methods, processing scripts, or analysis routines with minimal friction. Designed for collaborative development and rapid prototyping.
- 
- ## How to Use This Repository
- 
- 1. **Clone the repository:**
-	 ```bash
-	 git clone https://github.com/Valmohaugen/SC-Quantathon-v1-2024.git
-	 cd SC-Quantathon-v1-2024
-	 ```
- 2. **Generate or access datasets:**
-	 - Use scripts in `MiniGrant/DataGeneration/` (e.g., `DataGeneration.py`, `binary_string_to_binary.py`) to create new datasets or transform existing ones.
-	 - Explore the `MiniGrant/Data/` folder for pre-generated simulation results, organized by method and parameters.
- 3. **Post-process and analyze:**
-	 - Leverage scripts in `MiniGrant/PostProcessing/` to clean, rename, or analyze datasets.
-	 - Use the `SC-Quantathon-2024/common/renamed-datasets/` for standardized outputs ready for benchmarking or further study.
- 4. **Benchmark and compare:**
-	 - Review results across different simulation methods and qubit sizes. Use the organized folder structure (`Stage1` to `Stage5`) to track progress and compare approaches.
- 5. **Requirements:**
-	 - Ensure you have Python 3.10+ installed. Most scripts require standard libraries (e.g., `numpy`, `pandas`). Install any additional dependencies as needed.
- 
- ## Results
- 
- By running the workflow end-to-end, you can:
- 
- - Generate and simulate quantum datasets for a wide range of qubit counts and methods.
- - Analyze and visualize simulation outputs, extracting statistics and insights for benchmarking.
- - Compare the efficiency and accuracy of different simulation techniques.
- - Organize and standardize results for collaborative research and further experimentation.
- 
- **Dependencies:**
- - Python 3.10+
- - Standard scientific libraries (`numpy`, `pandas`)
- - Additional packages as required by specific scripts (see script headers or requirements)
+# SC Quantathon 2024: Quantum Random Number Generation
+
+This repository is the home for the 2024 DoraHacks SC Quantathon challenge, focused on implementing, characterizing, and verifying a Quantum Random Number Generator (QRNG) on IBM quantum processors using Hadamard-gate circuits with multiple extraction and post-processing methods.
+
+## Features
+
+* **QRNG Implementation (Stage 1):**
+
+  * Four bit-string generation algorithms: Mod2 XOR, Iteration with chunking, Concatenation, and a combined method applying all three.
+  * Runs on IBM QPUs (Brisbane, Sherbrooke) and the Qiskit Aer simulator.
+  * Configurable qubit count, shot number, chunk size, and method selection.
+
+* **ML Classification of Quantum vs. Classical Randomness (Stages 2 & 5):**
+
+  * SVM classifier achieving 75%+ accuracy distinguishing QRNG output from pseudo-random bitstrings.
+  * Evaluated XGBoost, Gradient Boosting, and SVM -- SVM selected as best performer.
+  * Stage 5 re-evaluates classification accuracy after entropy post-processing.
+
+* **Noise and Fidelity Characterization (Stage 3):**
+
+  * Analysis of hardware noise sources: decoherence times (T1, T2) and gate error probabilities.
+  * Readout assignment error analysis across qubits and machines.
+  * Comparison of noise-free simulator, noisy simulator, and pseudo-random baselines.
+  * Hadamard-to-native gate decomposition analysis.
+
+* **Entropy Extraction and Post-Processing (Stage 4):**
+
+  * Toeplitz matrix hashing for randomness extraction (using BYUCamachoLab's `ottoeplitz`).
+  * Von Neumann extractor for bias removal.
+  * Parity extractor for entropy concentration.
+  * FFT-based Toeplitz transformation.
+  * HPCG benchmark using QRNG data via a C shared library shim that intercepts `rand()` calls.
+
+* **Data Generation Pipeline:**
+
+  * Large-scale QRNG data generation across multiple methods, qubit counts (10--100,000), and backends.
+  * Post-processing analysis notebooks comparing entropy across extraction methods.
+
+## Project Structure
+
+```
+SC-Quantathon-v1-2024/
+  README.md
+  requirements.txt
+  .gitignore
+  MiniGrant/                            # Extended data generation pipeline
+    DataGeneration/
+      DataGeneration.py                 # Main QRNG script (4 methods, multi-backend)
+      increased_data_generation.ipynb   # Scaled-up generation notebook
+      binary_string_to_binary.py        # Text-to-binary file converter
+    PostProcessing/
+      postprocessing.py                 # Entropy extraction functions library
+      parity-extractor.py              # Standalone parity analysis
+      real_entropy_comparison.ipynb     # Entropy analysis on real QPU data
+      simple_entropy_comparison.ipynb   # Entropy analysis on simulated data
+  SC-Quantathon-2024/                   # 5-stage challenge submissions
+    common/
+      ottoeplitz.py                     # Toeplitz hashing (BYUCamachoLab)
+    renamed-datasets/                   # Processed datasets for classification
+    Stage1/                             # QRNG implementation
+    Stage2/                             # SVM quantum vs. classical classifier
+    Stage3/                             # Noise and fidelity characterization
+    Stage4/                             # Entropy extraction + HPCG benchmark
+    Stage5/                             # Post-extraction QRNG verification
+```
+
+## How to Use This Repository
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/Valmohaugen/SC-Quantathon-v1-2024.git
+   cd SC-Quantathon-v1-2024
+   ```
+
+2. **Set up your environment:**
+
+   ```bash
+   conda create -n quantathon python=3.10
+   conda activate quantathon
+   pip install -r requirements.txt
+   ```
+
+3. **Set your IBM Quantum token** (required for QPU execution):
+
+   ```bash
+   export IBM_QUANTUM_TOKEN="your-token-here"
+   ```
+
+4. **Generate QRNG data:**
+
+   ```bash
+   cd MiniGrant/DataGeneration
+   python DataGeneration.py
+   ```
+
+   Adjust `method`, `machine`, `num_qubits`, and other parameters at the top of the script.
+
+5. **Explore the challenge stages:**
+
+   Open the Stage notebooks in Jupyter:
+   - `SC-Quantathon-2024/Stage1/Stage1.ipynb` -- QRNG circuits
+   - `SC-Quantathon-2024/Stage2/SVMClassifier.ipynb` -- ML classification
+   - `SC-Quantathon-2024/Stage3/` -- Noise analysis (5 notebooks)
+   - `SC-Quantathon-2024/Stage4/entropize.ipynb` -- Entropy extraction
+   - `SC-Quantathon-2024/Stage5/SVMOurQvsPEntropied.ipynb` -- Final verification
+
+## Results
+
+* Generated QRNG bitstrings at scales from 10 to 100,000 qubits across 4 methods and 2 IBM backends.
+* Built an SVM classifier that distinguishes quantum from classical random bitstrings with 75%+ accuracy after entropy post-processing.
+* Characterized the impact of T1/T2 decoherence and gate errors on QRNG output quality.
+* Demonstrated Toeplitz hashing and Von Neumann extraction improve entropy of raw QRNG output.
+* Applied QRNG as the entropy source for an HPCG benchmark via a shared library `rand()` shim.
+
+**Dependencies:**
+
+* Python 3.10+, Jupyter, qiskit, qiskit-aer, qiskit-ibm-runtime, numpy, scipy, matplotlib, scikit-learn, pandas.
